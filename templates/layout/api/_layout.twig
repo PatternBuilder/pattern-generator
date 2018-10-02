@@ -1,0 +1,108 @@
+{### LOGIC ###}<% if ( props.template_elements.includes( 'header' ) ) { %>
+{% set has_header = header.content|length > 0 or block( "header" ) is not empty %}<% } if( props.template_elements.includes( 'body' ) ) { %>
+{% set has_body     = body.content|length > 0 or block( "body" ) is not empty %}<% } if( props.template_elements.includes( 'aside' ) ) { %>
+{% set has_aside    = aside.content|length > 0 or block( "aside" ) is not empty %}<% } if( props.template_elements.includes( 'footer' ) ) { %>
+{% set has_footer   = footer.content|length > 0 or block( "footer" ) is not empty %}<% }
+
+if ( props.template_elements.includes( 'background' ) ) { %>
+
+{# THEME is based on background color #}
+{% set theme = "light" %}
+{% if background.color in [ "black", "rich-black", "red", "teal", "green", "blue" ] %}
+    {% set theme = "dark" %}
+{% endif %}
+
+{# Add the desaturated subtheme if the background color is in the red or blue family #}
+{% if background.color in [ "red", "teal", "green", "blue" ] %}
+    {% set theme =  theme|trim ~ " desaturated" %}
+{% endif %}<% } %>
+
+{### SET CLASSES, ATTRIBUTES, PROPERTIES ###}
+
+{%- set <%= props.name.toUnderscore() %>_classes -%}
+    {% if meta.class|length > 0 %}{% for item in meta.class %} {{ item }}{% endfor %}{% endif %}
+{%- endset -%}
+
+{% set <%= props.name.toUnderscore() %>_props %}
+    {% if meta.id %} id="{{ meta.id }}"{% endif %}
+    {% if meta.uniqueId %} data-rh-unique-id="{{ meta.uniqueId }}"{% endif %}<% if ( props.template_elements.includes( 'background' ) ) { %>
+    {% if background.color %} data-rh-background="{{ background.color }}" {% endif %}
+    {% if background.image_large.src %}data-rh-bq="{{ background.image_large.src }}{% if background.image_small.src %}, {{ background.image_small.src }}{% endif %}"{% endif %}
+    {% if (background.image_large.src or background.image_small.src) and background.overlay is not empty and background.color in [ "black", "rich-black" , "red", "teal", "green", "blue" ] %} data-rh-overlay="{{ overlay_color }}-{{ background.overlay|replace({"%": ""}) }}"{% endif %}
+    {% if background.isFixed %} data-rh-background-fixed{% endif %}
+    {% if background.align %} data-rh-background-align="{{ background.align }}"{% endif %}<% } if ( props.template_elements.includes( 'config' ) && props.config_options.includes( 'collapse' ) ) { %>
+    {% if config.collapse %} data-rh-<%= props.name.toUnderscore() %>-collapse="{{ config.collapse }}"{% endif %}<% } if ( props.template_elements.includes( 'config' ) && props.config_options.includes( 'vertical_spacing' ) ) { %>
+    {% if config.vertical_spacing %} data-rh-layout="{{ config.vertical_spacing }}"{%- endif %}<% } if ( props.template_elements.includes( 'config' ) && props.config_options.includes( 'eqpts' ) ) { %>
+    {% set eq_obj = { full_custom: "small: 0, medium: 220, large: 320" } %}{% if config.eqpts %}{% set eq_obj = { full_custom: config.eqpts } %}{% endif %}
+    {% include "eqpts.twig" with eq_obj only %}<% } if ( props.template_elements.includes( 'config' ) && props.config_options.includes( 'justify' ) ) { %>
+    {% if config.justify %} data-rh-justify="{{ config.justify }}"{% endif %}<% } %>
+{% endset %}
+<% if ( props.template_elements.includes( 'config' ) && props.config_options.includes( 'vertical_spacing' ) ) { %>
+{% set <%= props.name.toUnderscore() %>_main %}
+    data-rh-layout="{% if config.vertical_spacing %}{{ config.vertical_spacing }}{% else %}stacked{% endif %}"
+{% endset %}<% } %>
+<% props.template_elements.forEach( function( element, idx ) {
+    if ( element === 'header' || element === 'body' || element === 'aside' || element === 'footer' ) { %>
+{% set <%= props.name.toUnderscore() %>_<%= element %> %}
+    {% if <%= element %>.layout %} data-rh-layout="{{ <%= element %>.layout }}"{% endif %}
+{% endset %}<% } } ); %>
+
+{### MARKUP ###}
+{%- if <% props.template_elements.forEach( function( element, idx ) {
+    if ( idx > 0 ) { %> or<% }
+    if ( element === 'header' || element === 'body' || element === 'aside' || element === 'footer' ) { %>has_<%= element %><%
+} } ); %> -%}
+<div class="rh-<%= props.name.toDash() %>--<%= props.template_type %>{{ <%= props.name.toUnderscore() %>_classes }}" {{ <%= props.name.toUnderscore() %>_props }}><%
+
+if ( props.template_elements.includes( 'header' ) || props.template_elements.includes( 'body' ) || props.template_elements.includes( 'footer' ) ) {
+%>
+    {%- if <% props.template_elements.forEach( function( element, idx ) {
+        if ( element === 'header' || element === 'body' || element === 'footer' ) {
+            if ( idx > 0 ) { %> or<% } %> has_<%= element %><%
+        }
+    } ); %> -%}
+    <section class="rh-<%= props.name.toDash() %>-main" {{ <%= props.name.toUnderscore() %>_main }}><%
+
+        if ( props.template_elements.includes( 'header' ) ) { %>
+        {% if has_header %}
+        <header class="rh-<%= props.name.toDash() %>-header"{{ <%= props.name.toUnderscore() %>_header }}>
+            {% for item in header.content %}
+                {% include item.template ?: item.name ~ ".twig" with item only %}
+            {% else %} {% block header %}{% endblock %}
+            {% endfor %}
+        </header>
+        {% endif %}<% }
+
+        if ( props.template_elements.includes( 'body' ) ) { %>
+        {% if has_body %}
+        <div class="rh-<%= props.name.toDash() %>-content" {{ <%= props.name.toUnderscore() %>_body }}>
+            {% for item in body.content %}
+                {% include item.template ?: item.name ~ ".twig" with item only %}
+            {% else %} {% block body %}{% endblock %}
+            {% endfor %}
+        </div>
+        {% endif %}<% }
+
+        if ( props.template_elements.includes( 'footer' ) ) { %>
+        {% if has_footer %}
+        <footer class="rh-<%= props.name.toDash() %>-footer" {{ <%= props.name.toUnderscore() %>_footer }}>
+            {% for item in footer.content %}
+                {% include item.template ?: item.name ~ ".twig" with item only %}
+            {% else %} {% block footer %}{% endblock %}
+            {% endfor %}
+        </footer>
+        {% endif %}<% } %>
+    </section>
+    {% endif %}< % }
+
+    if ( props.template_elements.includes( 'aside' ) ) { %>
+    {% if has_aside %}
+    <aside class="rh-<%= props.name.toDash() %>-aside" {{ <%= props.name.toUnderscore() %>_aside }}>
+        {% for item in aside.content %}
+            {% include item.template ?: item.name ~ ".twig" with item only %}
+        {% else %} {% block aside %}{% endblock %}
+        {% endfor %}
+    </aside>
+    {%- endif -%}<% } %>
+</div>
+{%- endif -%}

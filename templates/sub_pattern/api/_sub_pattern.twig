@@ -1,0 +1,46 @@
+<!-- <%= props.template_type.replace( /_/g, "" ).toSentenceCase() %> | <%= props.name.replace(" "/g, "_") %>  --><%
+
+if ( props.elements.content_elements.length > 0 ) { %>
+{# --- Available content variables:<%-
+    include( '../../block/twig/_custom.twig', {
+        elements: props.elements,
+        names_list: props.elements.content_elements,
+        context: "content"
+    } ); _%>
+--------------------------------------- #}
+<% }
+
+if ( props.elements.custom_elements.length > 0 ) { %>
+{# --- Available custom variables:<%-
+    include( '../../block/twig/_custom.twig', {
+        elements: props.elements,
+        names_list: props.elements.custom_elements,
+        context: "custom"
+    } ); _%>
+--------------------------------------- #}
+<% }
+
+%>
+{# //-- Custom logic goes here #}
+{# End custom logic --// #}
+
+{# Wrap your <%= props.template_type %> in an if statement for any required fields #}
+{# if required.property #}<% if ( props.template_elements.includes( 'container' ) ) {  %>
+    {% set container_type = container.background ? "card" : "group" %}<% } %>
+
+    {% include <% if ( props.template_elements.includes( 'container' ) ) {  %>container_type ~ "<% } else { %>"group<% } %>.twig" with {
+        "name": <% if ( props.template_elements.includes( 'container' ) ) {  %>container_type<% } else { %>"group"<% } %>,
+        "config": {<% if ( props.template_elements.includes( 'container' ) ) {  %>
+            "justify": container_type == "card" ? "justify" : "",
+            "vertical_layout": container_type == "card" ? "stacked" : ""<% } %>,
+            "eqpts": eqpts ?: <% if ( props.template_elements.includes( 'container' ) ) {  %>container_type == "card" ? "small-box: 0, large-box: 400" :  <% } %>"small-box: 0, medium-box: 290, large-box: 400"
+        }<% if ( props.template_elements.includes( 'container' ) ) {  %>,
+        "background": {
+            "color": container.background
+        }<% } %>,
+        "body": {
+            "content": []
+        }
+    } only %}
+    {% endembed %}
+{# endif #}

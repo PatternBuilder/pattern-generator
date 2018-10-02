@@ -1,0 +1,54 @@
+<!-- <%= props.template_type.toSentenceCase() %> | <%= props.name.replace(" "/g, "_") %>  -->
+<%
+if ( props.elements.custom_elements.length > 0 ) { %>{# --- Available custom variables:
+    <%- include( '../../block/twig/_custom.twig', {
+        elements: props.elements,
+        names_list: props.elements.custom_elements,
+        context: "custom"
+    } ) %>
+--------------------------------------- #}<% } // close if custom elements
+%>
+
+{# Custom logic goes here #}
+{# End custom logic #}
+
+{# Call the band layout #}
+{% embed "band.twig" with {
+    "global": _context,
+    "meta": meta,
+    "config": {
+        "vertical_spacing": "stacked"
+    }<% if ( props.template_elements.includes( 'background' ) ) { %>,
+    "background": {<% props.background_options.forEach( function( property, idx ) { if ( idx > 0 ) { %>,<% } if( property == 'color' ) { %>
+        "color": background.color<% } else if ( property == 'overlay' ) { %>,
+        "overlay": background.overlay<% } else if ( property == 'images' ) { %>,
+        "image_large": {
+            "src": background.image_large.src
+        },
+        "image_small": {
+            "src": background.image_small.src
+        }<% } else if ( property == 'isFixed' ) { %>,
+        "isFixed": background.isFixed<% } else if ( property == 'align' ) { %>,
+        "align": background.align<% } } ); %>
+    }<% } if ( props.template_elements.includes( 'header' ) ) { %>,
+    "header": {
+        "layout": header.layout,
+        "content": header.sub_patterns
+    }<% } if( props.template_elements.includes( 'body' ) ) { %>,
+    "body": {
+        "layout": body.layout,
+        "content": body.sub_patterns
+    }<% } if ( props.template_elements.includes( 'aside' ) ) { %>,
+    "aside": {
+        "layout": aside.layout,
+        "position": "right full",
+        "position_mobile": "bottom",
+        "content": aside.sub_patterns
+    }<% } if ( props.template_elements.includes( 'footer' ) ) { %>,
+    "footer": {
+        "layout": footer.layout,
+        "position": "",
+        "content": footer.sub_patterns
+    }<% } %>
+} only %}
+{% endembed %}

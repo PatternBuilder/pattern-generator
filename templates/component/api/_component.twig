@@ -1,0 +1,114 @@
+<!-- <%= props.name.toSentenceCase() %> <%= props.template_type %> -->
+<% if ( props.elements.custom_elements.length > 0 ) { %>
+{# --- Available custom variables:<%-
+    include( '../../block/twig/_custom.twig', {
+        elements: props.elements,
+        names_list: props.elements.custom_elements,
+        context: "custom"
+    } ); -%>
+--------------------------------------- #}<% } // close if custom elements
+
+// Template elements
+if ( props.template_elements.length > 0 ) {
+    // SEO properties
+    if ( props.template_elements.includes( 'seo' ) ) { %>
+
+{% if config.seo.position == "primary" %}
+    {% if config.seo.priority == "standard" %}
+        {% set title_tag = "h1" %}
+        {% set headline_tag = "h2" %}
+    {% elseif config.seo.priority == "title" %}
+        {% set title_tag = "h1" %}
+        {% set headline_tag = "p" %}
+    {% elseif config.seo.priority == "headline" %}
+        {% set title_tag = "p" %}
+        {% set headline_tag = "h1" %}
+    {% endif %}
+{% elseif config.seo.position == "secondary" %}
+    {% if config.seo.priority == "standard" %}
+        {% set title_tag = "h2" %}
+        {% set headline_tag = "h3" %}
+    {% elseif config.seo.priority == "title" %}
+        {% set title_tag = "h2" %}
+        {% set headline_tag = "p" %}
+    {% elseif config.seo.priority == "headline" %}
+        {% set title_tag = "p" %}
+        {% set headline_tag = "h2" %}
+    {% endif %}
+{% endif %}<%
+
+    } // end SEO
+} // end template element if
+%>
+
+{# Wrap your <%= props.template_type %> in an if statement for any required fields #}
+{# if required.property #}
+{% spaceless %}
+<div class="rh-<%= props.name.toDash() %>--<%= props.template_type %>" {{ misc_data }}<%
+    if ( props.template_elements.includes( 'align' ) ) { %> {{ config.align ? "data-rh-align=" ~ config.align }}<% }
+    if ( props.template_elements.includes( 'size' ) ) { %> {{ config.size ? "data-rh-size=" ~ config.size }}<% } %>>
+    <% if ( props.template_elements.includes( 'title' ) ) { %>
+    {% if title %}
+        <{{ title_tag ?: h2 }} class="rh-<%= props.name.toDash() %>-title">
+            {% include "no_html.twig" with { "string": title } only %}
+        </{{ title_tag }}>
+    {% endif %}<% }
+
+    if ( props.template_elements.includes( 'headline' ) ) { %>
+    {% if headline %}
+        <{{ headline_tag ?: h3 }} class="rh-<%= props.name.toDash() %>-headline">
+            {% include "no_html.twig" with { "string": headline } only %}
+        </{{ headline_tag }}>
+    {% endif %}<% }
+
+    if ( props.template_elements.includes( 'summary' ) ) { %>
+    {% if summary %}
+        <p class="rh-<%= props.name.toDash() %>-summary">
+            {% include "summary_field.twig" with { "summary": summary } only %}
+        </p>
+    {% endif %}<% }
+
+    if ( props.template_elements.includes( 'link' ) ) { %>
+    {% if link.href and link.text %}
+        <a class="rh-<%= props.name.toDash() %>-link"
+            href="{% include 'no_html.twig' with { 'string': link.href } only %}"
+            {% if link.title %} title="{% include 'no_html.twig' with { 'string': link.title } only %}"{% endif %}>
+                {% include "no_html.twig" with { "string": link.text } only %}
+        </a>
+    {% endif %}<% }
+
+    if ( props.template_elements.includes( 'image' ) ) { %>
+    {% if image.src %}
+        <img class="rh-<%= props.name.toDash() %>-image"
+            src="{% include 'no_html.twig' with { 'string': image.src } only %}"
+            {% if image.alt %} alt="{% include 'no_html.twig' with { 'string': image.alt } only %}"{% endif %}/><% }
+
+    if ( props.template_elements.includes( 'video' ) ) { %>
+    {% if video.video_src %}
+        <div class="rh-<%= props.name.toDash() %>-video">
+            {% autoescape false %}{{ video.video_src }}{% endautoescape %}
+        </div>
+    {% endif %}<% }
+
+    // Custom elements
+    for ( var [ name, element ] of Object.entries( props.elements ) ) {
+        if ( props.elements.custom_elements.includes( name ) ) {
+        // Only add if it's a string
+        if ( element.options.type === 'string' && !element.options.dropdown ) { %>
+    {% if <%= element.name.toUnderscore() %> %}
+        <span class="rh-<%= props.name.toDash() %>-<%= element.name.toDash() %>"> {{ <%= element.name.toUnderscore() %> }} </span>
+    {% endif %}<% } // end string
+
+        for ( var [ c_name, child ] of Object.entries( element.children ) ) {
+            if ( element[ name + "_elements" ].includes( c_name ) ) {
+            if ( child.options.type === 'string' && !child.options.dropdown ) { %>
+    {% if <%= element.name.toUnderscore() %>.<%= child.name.toUnderscore() %> %}
+        <span class="rh-<%= props.name.toDash() %>-<%= element.name.toDash() %>-<%= child.name.toDash() %>"> {{ <%= element.name.toUnderscore() %>.<%= child.name.toUnderscore() %> }} </span>
+    {% endif %}<%
+            } }
+        }  // end children elements
+    } } // end custom elements
+    %>
+</div>
+{% endspaceless %}
+{# endif #}

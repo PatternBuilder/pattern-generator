@@ -1,0 +1,28 @@
+<!-- <%= props.name.toSentenceCase() %> <%= props.template_type %> -->
+<% if ( props.elements.custom_elements.length > 0 ) { %>{# --- Available custom variables:
+    <%- include( '../../block/twig/_custom.twig', {
+        elements: props.elements,
+        names_list: props.elements.custom_elements,
+        context: "custom"
+    } ); -%>
+--------------------------------------- #}<% } // close if custom elements
+%>
+
+{% autoescape false %}<%
+
+// Custom elements
+for ( var [ name, element ] of Object.entries( props.elements ) ) {
+    if ( props.elements.custom_elements.includes( name ) ) {
+    // Only add if it's a string
+    if ( element.options.type === 'string' && !element.options.dropdown ) { %>
+    {% if <%= element.name.toUnderscore() %> %} {{ <%= element.name.toUnderscore() %> }} {% endif %}<%
+    } // end string
+
+    for ( var [ c_name, child ] of Object.entries( element.children ) ) {
+        if ( element[ name + "_elements" ].includes( c_name ) ) {
+        if ( child.options.type === 'string' && !child.options.dropdown ) { %>
+    {% if <%= element.name.toUnderscore() %>.<%= child.name.toUnderscore() %> %} {{ <%= element.name.toUnderscore() %>.<%= child.name.toUnderscore() %> }} {% endif %}
+<% } } }  // end children elements
+} } // end custom elements
+
+%>{% endautoescape %}

@@ -1,0 +1,26 @@
+.#{$repo}-<%= props.name.toDash() %> {
+    &--<%= props.template_type %> {}<%
+
+    if ( props.template_type === "layout" ) { %>
+    &-main {}<%
+    }
+
+    if ( props.template_elements.length > 0 ) {
+        props.template_elements.forEach( function( property, idx ) {
+            if ( property !== 'align' && property !== 'size' && property !== 'seo' ) { %>
+    &-<%= property.toDash() %> {}<%
+            }
+        } );
+    }
+
+    // -- CUSTOM ELEMENTS
+    if ( props.elements.custom_elements.length > 0 ) {
+        for ( var [ name, element ] of Object.entries( props.elements ) ) {
+            if ( props.elements.custom_elements.includes( name ) ) {
+                if ( element.options.type === "string" ) { %>
+    &-<%= name.toDash() %> {}<%
+                } // end string if
+            }  // end custom element array check
+        }  // end for loop of objects
+    } // END CUSTOM ELEMENTS %>
+}

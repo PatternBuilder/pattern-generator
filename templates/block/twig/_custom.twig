@@ -1,0 +1,26 @@
+<%
+
+// Iterate over custom objects
+for ( var [ name, element ] of Object.entries( elements ) ) {
+    // Check that this property is an element
+    if ( names_list.includes( name ) ) { %>
+    * <%= element.name.toUnderscore() %>: <%= element.options.type %><%
+    if ( element.options.format !== null ) { %>, <%= element.options.format %><% }
+    if ( element.options.dropdown ) { %>, enum/dropdown<% }
+    if ( element.options.type === '$ref' ) { %> - <%= element.refs %><% }
+    if ( element.options.required) { %> (required)<% }
+
+    // Iterate over children objects
+    for ( var [ c_name, child ] of Object.entries( element.children ) ) {
+        if ( element[ element.name + "_elements" ].includes( c_name ) ) { %>
+        - <%= c_name.toUnderscore() %>: <%= child.options.type %><%
+            if ( child.options.format !== null ) { %>, <%= child.options.format %><% }
+            if ( child.options.dropdown ) { %>, enum/dropdown<% }
+            if ( child.options.type === '$ref' ) { %> - <%= child.refs %><% }
+            if ( child.options.required) { %> (required)<% }
+        } // end name check
+    } // end child loop
+    } // end required list
+} // end custom loop
+
+%>

@@ -1,0 +1,29 @@
+{
+  "name": "pattern-generator",
+  "version": "1.0.0",
+  "description": "A yeoman generator for patterns compatible with PatternKit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PatternBuilder/pattern-generator.git"
+  },
+  "keywords": [
+    "pattern",
+    "generator",
+    "yeoman",
+    "library",
+    "builder",
+    "front-end",
+    "web",
+    "development"
+  ],
+  "author": "castastrophe",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/PatternBuilder/pattern-generator/issues"
+  },
+  "homepage": "https://github.com/PatternBuilder/pattern-generator#readme"
+}

@@ -1,0 +1,882 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "<%= props.name.toSentenceCase() %>",
+    "description": "<% if ( props.template_type !== "page" ) { %><%= props.description %><% } else { %>This provides a general preview of what is available in the <%= props.name.toSentenceCase() %> content type in Drupal.<% } %>",<% if ( props.template_type !== "atom" ) { %>
+    "type": "object",<% } %>
+    "category": "<%= props.template_type %>",<% if ( props.template_type !== "atom" ) { %>
+    "status": "<% if ( typeof props.status !== "undefined" ) { %><%= props.status %><% } else { %>inactive<% } %>",<% } %>
+    "format": "grid",
+    "properties": {
+        "name": {
+            "type": "string",
+            "readonly": true,
+            "enum": [ "<%= props.name.toUnderscore() %>" ],
+            "options": {
+                "hidden": true
+            }
+        }<%
+
+    // Template + misc_data available in component and layout only
+    if ( props.template_type === "component" || props.template_type === "layout" ) { %>,
+        "template": {
+            "type": "string",
+            "options": {
+                "hidden": true
+            }
+        },
+        "misc_data": {
+            "title": "Custom data attribute",
+            "type": "string",
+            "options": {
+                "hidden": true
+            }
+        }<%
+    }
+
+    // Metadata available in layout and pattern only
+    if ( props.template_type === "layout" || props.template_type.startsWith( "pattern" ) ) { %>,
+        "meta": {
+            "title": "Metadata",
+            "type": "object",
+            "options": {
+                "hidden": true
+            },
+            "properties": {
+                "class": {
+                    "type": "array",
+                    "options": {
+                        "hidden": true
+                    },
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "options": {
+                        "hidden": true
+                    }
+                },
+                "uniqueId": {
+                    "type": "string",
+                    "options": {
+                        "hidden": true
+                    }
+                }
+            }
+        }<%
+    }
+
+    // Specific properties only for the page type
+    if ( props.template_type === "page" ) { %>,
+        "config": {
+            "title": "Custom code configuration",
+            "type": "object",
+            "options": {
+                "hidden": true
+            },
+            "properties": {
+                "body_class": {
+                    "title": "Body class",
+                    "type": "string",
+                    "default": "editorial"
+                },
+                "additional_css": {
+                    "title": "Additional CSS files",
+                    "description": "Use full URL such as <code>https://www.redhat.com/files/webux/css/services/services.css</code> or local files like <code>http://localhost:9001/css/services/services.css</code>",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "additional_js": {
+                    "title": "Additional JS files",
+                    "description": "Use full URL such as <code>https://www.redhat.com/files/webux/js/webux-default.js</code> or local files like <code>http://localhost:9001/js/webux-default.js</code>",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }<%
+    }
+
+    // Navigation properties
+    if ( props.template_elements.includes( 'navigation' ) ) { %>,
+        "navigation": {
+            "type": "string",
+            "format": "html",
+            "formatter": "navigation",
+            "options": {
+                "wysiwyg": false,
+                "hidden": true
+            }
+        }<%
+    }
+
+    // Alignment properties
+    if ( props.template_elements.includes( 'align' ) ) { %>,
+        "align": {
+            "title": "Alignment",
+            "type": "string",
+            "enum": [ "left", "right", "center" ],
+            "default": "left",
+            "options": {
+                "grid_columns": 4
+            }
+        }<%
+    }
+
+    // Size properties
+    if ( props.template_elements.includes( 'size' ) ) { %>,
+        "size": {
+            "title": "Size",
+            "type": "string",
+            "enum": [ "small", "medium", "large" ],
+            "default": "medium",
+            "options": {
+                "grid_columns": 4
+            }
+        }<%
+    }
+
+    // SEO properties
+    if ( props.template_elements.includes( 'seo' ) ) { %>,
+        "seo": {
+            "title": "SEO",
+            "description": "These values allow you to specify heading tags used for headline and title for SEO purposes. Without SEO, headings default to page content settings.",
+            "type": "object",
+            "format": "grid",
+            "options": {
+                "grid_columns": 8
+            },
+            "properties": {
+                "position": {
+                    "title": "Position",
+                    "description": "Value determines if header is page header (primary) or content header (secondary)",
+                    "type": "string",
+                    "enum": [ "primary", "secondary" ],
+                    "default": "secondary",
+                    "options": {
+                        "grid_columns": 4
+                    }
+                },
+                "priority": {
+                    "title": "Priority",
+                    "description": "Determines which property to place as higher heading value.",
+                    "type": "string",
+                    "enum": [ "standard", "title", "headline" ],
+                    "default": "standard",
+                    "options": {
+                        "grid_columns": 4
+                    }
+                }
+            }
+        }<%
+    }
+
+    // -- Standard string type properties: title, headline, summary
+    if ( props.template_elements.includes( 'title' ) ) { %>,
+        "title": {
+            "title": "Title",
+            "description": "Short, keyword-heavy intro text.",
+            "type": "string",
+            "options": {
+                "grid_column": 12,
+                "preview": true
+            }
+        }<%
+    }
+    if ( props.template_elements.includes( 'headline' ) ) { %>,
+        "headline": {
+            "title": "Headline",
+            "description": "Longer descriptive text.",
+            "type": "string",
+            "options": {
+                "grid_column": 12,
+                "preview": true
+            }
+        }<%
+    }
+    if ( props.template_elements.includes( 'summary' ) ) { %>,
+        "summary": {
+            "title": "Summary",
+            "description": "Allowed tags: &lt;a&gt;&lt;br&gt;&lt;sup&gt;&lt;small&gt;",
+            "type": "string",
+            "format": "html",
+            "options": {
+                "grid_column": 12
+            }
+        }<%
+    }
+
+    // -- Standard ref/entity properties
+    if ( props.template_elements.includes( 'link' ) ) { %>,
+        "link": {
+            "$ref": "link.json",
+            "options": {
+                "grid_column": 6
+            }
+        }<%
+    }
+    if ( props.template_elements.includes( 'image' ) ) { %>,
+        "image": {
+            "$ref": "image.json",
+            "options": {
+                "grid_column": 6
+            }
+        }<%
+    }
+    if ( props.template_elements.includes( 'video' ) ) { %>,
+        "video": {
+            "$ref": "video.json",
+            "options": {
+                "grid_column": 6
+            }
+        }<%
+    }
+
+    // Config template settings
+    if ( props.template_elements.includes( 'config' ) ) { %>,
+        "config": {
+            "title": "Configuration",
+            "type": "object",
+            "format": "grid",
+            "options": {
+                "grid_columns": 12
+            },
+            "properties": {<%
+                props.config_options.forEach( function( property, idx ) { if ( idx > 0 ) { %>,<% }
+
+                if( property == 'collapse' ) { %>
+                "collapse": {<% if( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/band_collapse"<% } else { %>
+                    "title": "Collapse padding",
+                    "description": "To alter the default padding in this layout, select an option below to reduce or remove padding.",
+                    "type": "string",
+                    "enum": [ "full_top", "full_bottom", "full", "top", "bottom", "both" ]<% } %>,
+                    "options": {
+                        "grid_columns": 3
+                    }
+                }<% }
+
+                else if ( property == 'vertical_spacing') { %>
+                "vertical_spacing": {<% if( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/vertical_spacing"<% } else { %>
+                    "title": "Layout",
+                    "description": "Vertical space between elements.",
+                    "type": "string",
+                    "enum": [ "min-stacked", "stacked", "tall-stacked" ]<% } %>,
+                    "default": "stacked",
+                    "options": {
+                        "grid_columns": 3
+                    }
+                }<% }
+
+                else if ( property == 'eqpts') { %>
+                "eqpts": {<% if( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/eqpts"<% } else { %>
+                    "title": "Element query",
+                    "description": "Optional. Example: sm-box: 400, md-box: 600, lg-box: 900",
+                    "type": "string"<% } %>,
+                    "options": {
+                        "grid_columns": 3
+                    }
+                }<% }
+
+                else if ( property == 'justify') { %>
+                "justify": {<% if( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/justify"<% } else { %>
+                    "title": "Justify content",
+                    "description": "Justify will stretch card body to fill card height",
+                    "type": "string",
+                    "default": "top",
+                    "enum": [ "center", "top", "justify" ]<% } %>,
+                    "options": {
+                        "grid_columns": 3
+                    }
+                }<% }
+
+                else if ( property == 'breakpoints' ) { %>
+                "breakpoints": {<% if( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/breakpoints"<% } else { %>
+                    "title": "Breakpoints",
+                    "type": "array"<% } %>,
+                    "options": {
+                        "grid_columns": 6
+                    }<% if( props.template_type !== 'layout' ) { %>,
+                    "maxItems": 5,
+                    "items": {
+                        "title": "Breakpoint",
+                        "type": "string",
+                        "enum": [ "xxs", "xs", "sm", "md", "lg" ]
+                    }<% } %>
+                }<% }
+                } ); %>
+            },
+            "required": []
+        }<%
+    }
+
+    // Background templated settings
+    if ( props.template_elements.includes( 'background' ) ) { %>,
+        "background": {<%
+            // Layout can use the config atom, all others must be manually defined in the schema
+            if ( props.template_type === "layout" ) { %>
+            "$ref": "config.json#/properties/band_background_full"<% }
+
+            else if ( props.template_type.startsWith( "pattern" ) ) { %>
+            "title": "Background options",
+            "type": "object",
+            "format": "grid",
+            "properties": {<%
+
+                props.background_options.forEach( function( property, idx ) { if ( idx > 0 ) { %>,<% }
+                if( property == 'color' ) { %>
+                "color": {
+                    "title": "Background color",
+                    "description": "Background color if no image is loaded.",
+                    "type": "string",
+                    "enum": [ "white", "gray", "black", "rich-black", "red" ],
+                    "options": {
+                        "grid_columns": 4
+                    }
+                }<% }
+
+                else if ( property == 'overlay' ) { %>
+                "overlay": {
+                    "title": "Image overlay",
+                    "description": "Opacity of an optional overlay above the background image, which can improve legibility.",
+                    "type": "string",
+                    "enum": [ "30%", "50%", "70%", "90%" ],
+                    "options": {
+                        "grid_columns": 3
+                    }
+                }<% }
+
+                else if ( property == 'images' ) { %>
+                "image_large": {
+                    "title": "Large screen background image",
+                    "entity": "image",
+                    "type": "object",
+                    "options": {
+                        "grid_columns": 6
+                    },
+                    "properties": {
+                        "src": {
+                            "$ref": "image.json#/properties/src"
+                        }
+                    }
+                },
+                "image_small": {
+                    "title": "Small screen background image",
+                    "entity": "image",
+                    "type": "object",
+                    "options": {
+                        "grid_columns": 6
+                    },
+                    "properties": {
+                        "src": {
+                            "$ref": "image.json#/properties/src"
+                        }
+                    }
+                }<% }
+
+                else if ( property == 'isFixed' ) { %>
+                "isFixed": {
+                    "title": "Fixed background option",
+                    "description": "Fixing the background makes images stay in place when user scrolls, a.k.a. the paralax effect.",
+                    "type": "boolean",
+                    "options": {
+                        "grid_columns": 4
+                    }
+                }<% }
+
+                else if ( property == 'align' ) { %>
+                "align": {
+                    "title": "Alignment for background image",
+                    "type": "string",
+                    "enum": [ "center-center", "right-center", "left-center", "repeat" ],
+                    "default": "center-center",
+                    "options": {
+                        "grid_columns": 4
+                    }
+                }<% } } ); %>
+            }<% } %>
+        }<%
+    }
+
+    // Standard container settings (typically for subpattern only)
+    if ( props.template_elements.includes( 'container' ) ) {  %>,
+        "container": {
+            "title": "Container settings",
+            "type": "object",
+            "format": "grid",
+            "options": {
+                "grid_columns": 12
+            },
+            "properties": {
+                "background": {
+                    "title": "Card background",
+                    "description": "If you select a background color, your content will appear in a card.  If you leave this blank, your content will not have any padding and appear in a group.",
+                    "type": "string",
+                    "enum": [ "white", "gray", "dark-gray", "rich-black" ],
+                    "options": {
+                        "grid_columns": 6
+                    }
+                },
+                "align": {
+                    "title": "Alignment",
+                    "type": "string",
+                    "enum": [ "left", "center", "right" ],
+                    "default": "left",
+                    "options": {
+                        "grid_columns": 6
+                    }
+                }
+            }
+        }<%
+    }
+
+    // -- HEADER object
+    if ( props.template_elements.includes( 'header' ) ) { %>,
+        "header": {
+            "title": "Header",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+                "layout": {<% if ( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/layout"<% } else { %>
+                    "title": "Layout",
+                    "type": "string"<% } %>
+                },
+                "sub_patterns": {
+                    "title": "Header patterns",
+                    "type": "array",
+                    "maxItems": 1,
+                    "items": {
+                        "oneOf": [ <% props.header_refs.forEach( function( ref, idx ) { %>{
+                            "$ref": "<%= ref %>.json"
+                        }<% if ( ++idx < props.header_refs.length ) { %>,<% } %> <% } ); %>]
+                    }
+                }
+            }
+        }<%
+    }
+
+    // -- HEADER/BODY arrays for page content type
+    if ( props.template_type === "page" ) { %>,
+        "header": {
+            "title": "Header content",
+            "type": "array",
+            "maxItems": 1,
+            "items": {
+                "oneOf": [<% if ( props.header_refs.length > 0 ) {
+                    props.header_refs.forEach( function( ref, idx ) { %> {
+                    "$ref": "<%= ref.toUnderscore() %>.json"
+                }<% if ( ++idx < props.header_refs.length ) { %>,<% }
+                    } ); %> <%
+                } %>]
+            }
+        },
+        "body": {
+            "title": "Body content",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "oneOf": [<% if ( props.body_refs.length > 0 ) {
+                    props.body_refs.forEach( function( ref, idx ) { %> {
+                    "$ref": "<%= ref.toUnderscore() %>.json"
+                }<% if ( ++idx < props.body_refs.length ) { %>,<% }
+                    } ); %> <%
+                } %>]
+            }
+        }<%
+    }
+
+    // BODY object
+    if ( props.template_elements.includes( 'body' ) ) { %>,
+        "body": {
+            "title": "Body",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+                "layout": {<% if ( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/layout"<% } else { %>
+                    "title": "Layout",
+                    "type": "string"<% } %>
+                },
+                "sub_patterns": {
+                    "title": "Body patterns",
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "items": {
+                        "oneOf": [ <% props.body_refs.forEach( function( ref, idx ) { %>{
+                            "$ref": "<%= ref %>.json"
+                        }<% if ( ++idx < props.body_refs.length ) { %>,<% } %> <% } ); %>]
+                    }
+                }
+            }
+        }<%
+    }
+
+    // ASIDE object
+    if ( props.template_elements.includes( 'aside' ) ) { %>,
+        "aside": {
+            "title": "Aside",
+            "type": "object",
+            "format": "grid",
+            "options": {
+                "collapsed": true
+            },
+            "properties": {
+                "layout": {<% if ( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/layout"<% } else { %>
+                    "title": "Layout",
+                    "type": "string"<% } %>
+                },
+                "sub_patterns": {
+                    "title": "Aside item",
+                    "type": "array",
+                    "maxItems": 1,
+                    "items": {
+                        "oneOf": [ <% props.aside_refs.forEach( function( ref, idx ) { %>{
+                            "$ref": "<%= ref %>.json"
+                        }<% if ( ++idx < props.aside_refs.length ) { %>,<% } %> <% } ); %>]
+                    }
+                }
+            }
+        }<%
+    }
+
+    // FOOTER object
+    if ( props.template_elements.includes( 'footer' ) ) { %>,
+        "footer": {
+            "title": "Footer",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+                "layout": {<% if ( props.template_type === 'layout' ) { %>
+                    "$ref": "config.json#/properties/layout"<% } else { %>
+                    "title": "Layout",
+                    "type": "string"<% } %>
+                },
+                "sub_patterns": {
+                    "title": "Footer patterns",
+                    "type": "array",
+                    "maxItems": 1,
+                    "items": {
+                        "oneOf": [ <% props.footer_refs.forEach( function( ref, idx ) { %>{
+                            "$ref": "<%= ref %>.json"
+                        }<% if ( ++idx < props.footer_refs.length ) { %>,<% } %> <% } ); %>]
+                    }
+                }
+            }
+        }<%
+    }
+
+    // CONTENT object (typically subpattern only)
+    if ( props.template_elements.includes( 'content' ) ) {  %>,
+        "content": {
+            "title": "Content",
+            "type": "object",
+            "format": "grid",
+            "properties": {<%
+                // Content elements
+                let names_list = props.elements.content_elements,
+                    count = 1;
+                for ( let [ name, element ] of Object.entries( props.elements ) ) {
+                        // Check that this property is an element and in the right context
+                        if ( names_list.includes( name ) ) { %>
+                "<%= element.name.toUnderscore() %>": {<%
+
+                // Refs need only the reference setting, no other properties
+                if ( element.options.type === '$ref' ) { %>
+                    "$ref": "<%= element.refs %>"<%
+                }
+                // All non-ref types have title, description, type, and format
+                else { %>
+                    "title": "<%= element.name.toSentenceCase() %>",
+                    "description": "",
+                    "type": "<%= element.options.type %>",
+                    "format": "<% if ( element.options.format !== null ) { %><%= element.options.format %><% } else { %>grid<% } %>"<%
+
+                    // Dropdown
+                    if ( element.options.dropdown) { %>,
+                    "enum": [<%
+                        element.dropdown_items.forEach( function( item, d_idx ) { %> "<%= item %>"<%
+                            if ( ++d_idx < element.dropdown_items.length ) { %>,<% }
+                        } ); %> ],
+                    "default": "<% if ( element.dropdown_items.length > 0 ) { %><%= element.dropdown_items[ 0 ] %><% } %>"<%
+                    }
+
+                    // Boolean default
+                    if ( element.options.type === 'boolean' ) { %>,
+                    "default": false<%
+                    }
+
+                    // Option settings
+                    %>,
+                    "options": {
+                        "grid_columns": <%
+                            if ( ( element.options.type === 'string' && ![ 'textarea', 'html' ].includes( element.options.format ) )
+                                || element.options.dropdown || [ 'boolean', 'number' ].includes( element.options.type ) ) { %>4<% }
+                            else { %>12<% } %>,
+                        "hidden": false<% if ( element.options.type === 'object' ) { %>,
+                        "collapsed": false<% } if ( !element.options.wysiwyg ) { %>,
+                        "wysiwyg": false<% } %>
+                    }<%
+
+                    // Array-only properties
+                    if ( element.options.type === 'array' ) {
+                        // Min and max settings
+                        if ( element.options.min > 0 ) { %>,
+                    "minItems": <%= element.options.min %><%
+                        }
+                        if ( element.options.max > 0 ) { %>,
+                    "maxItems": <%= element.options.max %><%
+                        } %>,
+                    "items": {
+                        "oneOf": [ <% element.refs.forEach( function( ref, r_idx ) { %>{
+                            "$ref": "<%= ref.toUnderscore() %>.json"
+                        }<% if ( ++r_idx < element.refs.length ) { %>, <% } } ); %> ]
+                    }<%
+                    }
+
+                    // Object properties
+                    if ( element.options.type === 'object' ) { %>,
+                    "properties": {<%
+
+                        // If this object has CHILDREN elements
+                        let child_list = element[ element.name + "_elements" ],
+                            child_count = 1;
+                        for ( var [ child_name, child_element ] of Object.entries( element.children ) ) {
+                            // Check that this property is an element and in the right context
+                            if ( child_list.includes( child_name ) ) { %>
+                        "<%= child_element.name.toUnderscore() %>": {<%
+
+                        // Refs need only the reference setting, no other properties
+                        if ( child_element.options.type === '$ref' ) { %>
+                            "$ref": "<%= child_element.refs %>"<% }
+
+                        // All non-ref types have title, description, type, and format
+                        else { %>
+                            "title": "<%= child_element.name.toSentenceCase() %>",
+                            "description": "",
+                            "type": "<%= child_element.options.type %>",
+                            "format": "<% if ( child_element.options.format !== null ) { %><%= child_element.options.format %><% } else { %>grid<% } %>"<%
+
+                            // Dropdown
+                            if ( child_element.options.dropdown) { %>,
+                            "enum": [<%
+                                if ( child_element.dropdown_items.length > 0 ) {
+                                    child_element.dropdown_items.forEach( function( item, d_idx ) { %> "<%= item %>"<%
+                                    if ( ++d_idx < child_element.dropdown_items.length ) { %>,<% } } );
+                                } %> ],
+                            "default": "<% if ( child_element.dropdown_items.length > 0 ) { %><%= child_element.dropdown_items[ 0 ] %><% } %>"<% }
+
+                            // Boolean default
+                            if ( child_element.options.type === 'boolean' ) { %>,
+                            "default": false<% }
+
+                            // Option settings
+                            %>,
+                            "options": {
+                                "grid_columns": <%
+                                    if ( ( child_element.options.type === 'string' && ![ 'textarea', 'html' ].includes( child_element.options.format ) )
+                                        || child_element.options.dropdown || [ 'boolean', 'number' ].includes( child_element.options.type ) ) { %>4<% }
+                                    else { %>12<% } %>,
+                                "hidden": false<% if ( child_element.options.type === 'object' ) { %>,
+                                "collapsed": false<% } if ( !child_element.options.wysiwyg ) { %>,
+                                "wysiwyg": false<% } %>
+                            }<%
+
+                            // Array-only properties
+                            if ( child_element.options.type === 'array' ) {
+                                // Min and max settings
+                                if ( child_element.options.min > 0 ) { %>,
+                            "minItems": <%= child_element.options.min %><%
+                                } if ( child_element.options.max > 0 ) { %>,
+                            "maxItems": <%= child_element.options.max %><% }
+                                %>,
+                            "items": {
+                                "oneOf": [ <% if ( child_element.refs !== null ) { child_element.refs.forEach( function( ref, r_idx ) { %>{
+                                    "$ref": "<%= ref.toUnderscore() %>.json"
+                                }<% if ( ++r_idx < child_element.refs.length ) { %>, <% } } ); } %> ]
+                            }<% }
+
+                            // Object properties
+                            if ( child_element.options.type === 'object' ) { %>,
+                            "properties": {}<% }
+                        } // end ref else
+
+                        %>
+                        }<% if ( child_count++ < child_list.length ) { %>,<% }
+                            } // end if child_list includes
+                        } // end for loop of elements
+                    %>},
+                    "required": [<% element.required_list.forEach( function( req_prop, req_idx ) { %> "<%= req_prop.toUnderscore() %>"<% if ( ++req_idx < element.required_list.length ) { %>,<% } %> <% } ); %>]<%
+                    } //close object if statement
+                } // close else ref statement
+             %>
+                }<% if ( count++ < names_list.length ) { %>,<% }
+                    } // end if names_list includes
+                } // end for loop of elements
+            %>
+            },
+            "required": [<% props.elements.required_content_list.forEach( function( req_prop, req_idx ) { %> "<%= req_prop.toUnderscore() %>"<% if ( ++req_idx < props.elements.required_content_list.length ) { %>,<% } } ); %> ]
+        }<%
+    }
+
+
+        // -- CUSTOM ELEMENTS
+        let names_list = props.elements.custom_elements,
+            count = 1;
+        for ( var [ name, element ] of Object.entries( props.elements ) ) {
+                // Check that this property is an element and in the right context
+                if ( names_list.includes( name ) ) {
+                    if ( props.template_type !== "atom" ) { %>,<% } %>
+        "<%= element.name.toUnderscore() %>": {<%
+
+        // Refs need only the reference setting, no other properties
+        if ( element.options.type === '$ref' ) { %>
+            "$ref": "<%= element.refs %>"<%
+        }
+        // All non-ref types have title, description, type, and format
+        else { %>
+            "title": "<%= element.name.toSentenceCase() %>",
+            "description": "",
+            "type": "<%= element.options.type %>",
+            "format": "<% if ( element.options.format !== null ) { %><%= element.options.format %><% } else { %>grid<% } %>"<%
+
+            // Dropdown
+            if ( element.options.dropdown) { %>,
+            "enum": [<%
+                element.dropdown_items.forEach( function( item, d_idx ) { %> "<%= item %>"<%
+                    if ( ++d_idx < element.dropdown_items.length ) { %>,<% } } ); %> ],
+            "default": "<% if ( element.dropdown_items.length > 0 ) { %><%= element.dropdown_items[ 0 ] %><% } %>"<%
+            }
+
+            // Boolean default
+            if ( element.options.type === 'boolean' ) { %>,
+            "default": false<%
+            }
+
+            // Option settings
+            %>,
+            "options": {
+                "grid_columns": <%
+                    if ( ( element.options.type === 'string' && ![ 'textarea', 'html' ].includes( element.options.format ) )
+                        || element.options.dropdown || [ 'boolean', 'number' ].includes( element.options.type ) ) { %>4<% }
+                    else { %>12<% } %>,
+                "hidden": false<% if ( element.options.type === 'object' ) { %>,
+                "collapsed": false<% } if ( !element.options.wysiwyg ) { %>,
+                "wysiwyg": false<% } %>
+            }<%
+
+            // Array-only properties
+            if ( element.options.type === 'array' ) {
+                // Min and max settings
+                if ( element.options.min > 0 ) { %>,
+            "minItems": <%= element.options.min %><%
+                }
+                if ( element.options.max > 0 ) { %>,
+            "maxItems": <%= element.options.max %><%
+                } %>,
+            "items": {
+                "oneOf": [ <% element.refs.forEach( function( ref, r_idx ) { %>{
+                    "$ref": "<%= ref.toUnderscore() %>.json"
+                }<% if ( ++r_idx < element.refs.length ) { %>, <% } } ); %> ]
+            }<%
+            }
+
+            // Object properties
+            if ( element.options.type === 'object' ) { %>,
+            "properties": {<%
+
+                // If this object has CHILDREN elements
+                let child_list = element[ element.name + "_elements" ],
+                    child_count = 1;
+                for ( var [ child_name, child_element ] of Object.entries( element.children ) ) {
+                    // Check that this property is an element and in the right context
+                    if ( child_list.includes( child_name ) ) { %>
+                "<%= child_element.name.toUnderscore() %>": {<%
+
+                // Refs need only the reference setting, no other properties
+                if ( child_element.options.type === '$ref' ) { %>
+                    "$ref": "<%= child_element.refs %>"<% }
+
+                // All non-ref types have title, description, type, and format
+                else { %>
+                    "title": "<%= child_element.name.toSentenceCase() %>",
+                    "description": "",
+                    "type": "<%= child_element.options.type %>",
+                    "format": "<% if ( child_element.options.format !== null ) { %><%= child_element.options.format %><% } else { %>grid<% } %>"<%
+
+                    // Dropdown
+                    if ( child_element.options.dropdown) { %>,
+                    "enum": [<%
+                        if ( child_element.dropdown_items.length > 0 ) {
+                            child_element.dropdown_items.forEach( function( item, d_idx ) { %> "<%= item %>"<%
+                            if ( ++d_idx < child_element.dropdown_items.length ) { %>,<% } } );
+                        } %> ],
+                    "default": "<% if ( child_element.dropdown_items.length > 0 ) { %><%= child_element.dropdown_items[ 0 ] %><% } %>"<% }
+
+                    // Boolean default
+                    if ( child_element.options.type === 'boolean' ) { %>,
+                    "default": false<% }
+
+                    // Option settings
+                    %>,
+                    "options": {
+                        "grid_columns": <%
+                            if ( ( child_element.options.type === 'string' && ![ 'textarea', 'html' ].includes( child_element.options.format ) )
+                                || child_element.options.dropdown || [ 'boolean', 'number' ].includes( child_element.options.type ) ) { %>4<% }
+                            else { %>12<% } %>,
+                        "hidden": false<% if ( child_element.options.type === 'object' ) { %>,
+                        "collapsed": false<% } if ( !child_element.options.wysiwyg ) { %>,
+                        "wysiwyg": false<% } %>
+                    }<%
+
+                    // Array-only properties
+                    if ( child_element.options.type === 'array' ) {
+                        // Min and max settings
+                        if ( child_element.options.min > 0 ) { %>,
+                    "minItems": <%= child_element.options.min %><%
+                        } if ( child_element.options.max > 0 ) { %>,
+                    "maxItems": <%= child_element.options.max %><% }
+                        %>,
+                    "items": {
+                        "oneOf": [ <% if ( child_element.refs !== null ) { child_element.refs.forEach( function( ref, r_idx ) { %>{
+                            "$ref": "<%= ref.toUnderscore() %>.json"
+                        }<% if ( ++r_idx < child_element.refs.length ) { %>, <% } } ); } %> ]
+                    }<% }
+
+                    // Object properties
+                    if ( child_element.options.type === 'object' ) { %>,
+                    "properties": {}<% }
+                } // end ref else
+
+                %>
+                }<% if ( child_count++ < child_list.length ) { %>,<% }
+                    } // end if child_list includes
+                } // end for loop of elements
+            %>
+            },
+            "required": [<% element.required_list.forEach( function( req_prop, req_idx ) { %> "<%= req_prop.toUnderscore() %>"<% if ( ++req_idx < element.required_list.length ) { %>,<% } } ); %> ]<%
+            } //close object if statement
+        } // close else ref statement
+     %>
+        }<% if ( props.template_type === "atom" && count++ < names_list.length ) { %>,<% }
+            } // end if names_list includes
+        } // end for loop of elements
+
+    // END CUSTOM ELEMENTS
+    %>
+    },
+    "required": [ "name"<% props.elements.required_list.forEach( function( req_prop, req_idx ) { %>, "<%= req_prop.toUnderscore() %>"<% } ); %> ]<%
+    // Atoms do not have additional properties option
+    if ( props.template_type !== "atom" ) { %>,
+    "additionalProperties": false <% } %>
+}
